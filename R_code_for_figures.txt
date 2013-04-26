@@ -1,0 +1,358 @@
+#transparency colors function
+ addTrans <- function(color,trans)
+ {
+   # This function adds transparancy to a color.
+   # Define transparancy with an integer between 0 and 255
+   # 0 being fully transparant and 255 being fully visable
+   # Works with either color and trans a vector of equal length,
+   # or one of the two of length 1.
+ 
+   if (length(color)!=length(trans)&!any(c(length(color),length(trans))==1)) stop("Vector lengths not correct")
+   if (length(color)==1 & length(trans)>1) color <- rep(color,length(trans))
+   if (length(trans)==1 & length(color)>1) trans <- rep(trans,length(color))
+ 
+   num2hex <- function(x)
+   {
+     hex <- unlist(strsplit("0123456789ABCDEF",split=""))
+     return(paste(hex[(x-x%%16)/16+1],hex[x%%16+1],sep=""))
+   }
+   rgb <- rbind(col2rgb(color),trans)
+   res <- paste("#",apply(apply(rgb,2,num2hex),2,paste,collapse=""),sep="")
+   return(res)
+ }
+
+OR <- read.csv("~/Dropbox/jackknife_paper/MS-Jackknife/data/OR_forR.csv")
+OR_tel <- OR[OR[,5]=='Tel',]
+OR_tel_H <- subset(OR_tel, FC=='H')
+OR_tel_L <- subset(OR_tel, FC=='L')
+OR_tel_LQ <- subset(OR_tel, FC=='LQ')
+OR_tel_LQH <- subset(OR_tel, FC=='LQH')
+OR_aust <- OR[OR[,5]=='Aust',]
+OR_aust_H <- subset(OR_tel, FC=='H')
+OR_aust_L <- subset(OR_tel, FC=='L')
+OR_aust_LQ <- subset(OR_tel, FC=='LQ')
+OR_aust_LQH <- subset(OR_tel, FC=='LQH')
+
+
+#BoxPlot on TOP
+#par(fig=c(0,1,0.45,1), new=TRUE)
+#boxplot(OR_aust[,2] ~ OR_aust[,3], horizontal = TRUE, xaxt = "n", ylab = "Feature Class", cex = 1.5)
+#par(fig=c(0,1,0,0.70), new=TRUE)
+#plot(OR_aust_H[,1], OR_aust_H[,2], xlab = "Regularization Multiplier", ylab = "Average Omission Rate", pch = 0, cex = 1.5)
+#points(OR_aust_L[,1], OR_aust_L[,2], pch = 1, cex = 1.5)
+#points(OR_aust_LQ[,1], OR_aust_LQ[,2], pch = 2, cex = 1.5)
+#points(OR_aust_LQH[,1], OR_aust_LQH[,2], pch = 3, cex = 1.5)
+#legend("topright", legend =c('H','L','LQ','LQH'), pch=0:3, bty = "n", cex = 1.5)
+
+#PLOT OMISSION RATE
+par(fig=c(0,0.72,0,0.6))
+plot(OR_tel_H[,1], OR_tel_H[,2], xlab = "regularization multiplier", ylab = "average omission rate", pch = 2, cex = 1.5, ylim=c(0,0.9))
+points(OR_tel_L[,1], OR_tel_L[,2], pch = 3, cex = 1.5)
+points(OR_tel_LQ[,1], OR_tel_LQ[,2], pch = 4, cex = 1.5)
+points(OR_tel_LQH[,1], OR_tel_LQH[,2], pch = 5, cex = 1.5)
+text(0.75, 0, font=3, 'Heteromys teleus')
+legend("topright", legend =c('H','L','LQ','LQH'), pch=2:5, bty = "n", cex = 1)
+par(fig=c(0.54,1,0,0.6), new=T)
+boxplot(OR_tel[,2] ~ OR_tel[,3], xlab = "feature class", cex = 1.5, pch = 20, ylim=c(0,0.9), yaxt='n', axes=F)
+axis(1, at=c(1:4), labels=c("H","L","LQ","LQH"))
+par(fig=c(0,0.72,0.4,1), new=T)
+plot(OR_aust_H[,1], OR_aust_H[,2], xaxt= 'n', ylab = "average omission rate", pch = 2, cex = 1.5, xlab='',ylim=c(0,0.9))
+points(OR_aust_L[,1], OR_aust_L[,2], pch = 3, cex = 1.5)
+points(OR_aust_LQ[,1], OR_aust_LQ[,2], pch = 4, cex = 1.5)
+points(OR_aust_LQH[,1], OR_aust_LQH[,2], pch = 5, cex = 1.5)
+axis(1,at=c(0.5,1,1.5,2),labels=c('','','',''))
+text(0.79,0,font=3,'Heteromys australis')
+par(fig=c(0.54,1,0.4,1), new=T)
+boxplot(OR_aust[,2] ~ OR_aust[,3], xlab = "", cex = 1.5, pch = 20, ylim=c(0,0.9), yaxt='n', axes=F)
+axis(1, at=c(1:4), labels=c('','','',''))
+
+AUC <- read.csv("~/Dropbox/jackknife_paper/MS-Jackknife/data/AUC_forR.csv")
+AUC_tel <- OR[OR[,5]=='Tel',]
+AUC_tel_H <- subset(OR_tel, FC=='H')
+AUC_tel_L <- subset(OR_tel, FC=='L')
+AUC_tel_LQ <- subset(OR_tel, FC=='LQ')
+AUC_tel_LQH <- subset(OR_tel, FC=='LQH')
+AUC_aust <- OR[OR[,5]=='Aust',]
+AUC_aust_H <- subset(OR_tel, FC=='H')
+AUC_aust_L <- subset(OR_tel, FC=='L')
+AUC_aust_LQ <- subset(OR_tel, FC=='LQ')
+AUC_aust_LQH <- subset(OR_tel, FC=='LQH')
+
+#boxplot on RIGHT
+par(fig=c(0.55,1,0,1), new=TRUE)
+boxplot(AUC_tel[,2] ~ AUC_tel[,3], yaxt = "n", xlab = "Feature Class", cex = 1.5, pch = 20, yaxt='n')
+par(fig=c(0,0.72,0,1), new=TRUE)
+plot(AUC_tel_H[,1], AUC_tel_H[,2], xlab = "Regularization Multiplier", ylab = "Average test AUC", pch = 0, cex = 1.5)
+points(AUC_tel_L[,1], AUC_tel_L[,2], pch = 1, cex = 1.5)
+points(AUC_tel_LQ[,1], AUC_tel_LQ[,2], pch = 2, cex = 1.5)
+points(AUC_tel_LQH[,1], AUC_tel_LQH[,2], pch = 3, cex = 1.5)
+legend("topleft", legend =c('H','L','LQ','LQH'), pch=0:3, bty = "n", cex = 1.5)
+
+AUC PLOT
+par(fig=c(0.55,1,0,1), new=TRUE)
+boxplot(AUC_aust[,2] ~ AUC_aust[,3], yaxt = "n", xlab = "Feature Class", cex = 1.5, pch = 20)
+par(fig=c(0,0.72,0,1), new=TRUE)
+plot(AUC_aust_LQ[,1], AUC_aust_LQ[,2], xlab = "Regularization Multiplier", ylab = "Average test AUC", pch = 2, cex = 1.5, ylim=c(0.515,0.807))
+points(AUC_aust_L[,1], AUC_aust_L[,2], pch = 1, cex = 1.5)
+points(AUC_aust_LQH[,1], AUC_aust_LQH[,2], pch = 3, cex = 1.5)
+points(AUC_aust_H[,1], AUC_aust_H[,2], pch = 0, cex = 1.5)
+legend("bottomleft", legend =c('H','L','LQ','LQH'), pch=0:3, bty = "n", cex = 1.5)g
+
+
+COLOR MAPS
+library(maps)
+library(raster)
+library(mapdata)
+
+r1 <- raster("../H/2.0/Heteromys_teleus_30A.asc")
+r2 <- raster("../H/2.0/Heteromys_teleus_30B.asc")
+r3 <- raster("../H/2.0/Heteromys_teleus_30C.asc")
+r4 <- raster("../H/2.0/Heteromys_teleus_30D.asc")
+r5 <- raster("../H/2.0/Heteromys_teleus_30E.asc")
+r6 <- raster("../H/2.0/Heteromys_teleus_30F.asc")
+r7 <- raster("../L/1.0/Heteromys_teleus_30A.asc")
+r8 <- raster("../L/1.0/Heteromys_teleus_30B.asc")
+r9 <- raster("../L/1.0/Heteromys_teleus_30C.asc")
+r10 <- raster("../L/1.0/Heteromys_teleus_30D.asc")
+r11 <- raster("../L/1.0/Heteromys_teleus_30E.asc")
+r12 <- raster("../L/1.0/Heteromys_teleus_30F.asc")
+s <- stack(r1,r2,r3,r3,r5,r6)
+t <- stack(r7,r8,r9,r10,r11,r12)
+fun <- function(x, ...) { x[x==0] <- NA; mean(x, na.rm=TRUE) } 
+m <- calc(s, fun)
+n <- calc(t, fun)
+locs <- read.csv("../locs/het_filtered.csv")
+tel <- locs[10:15,]
+test <- colorRampPalette(c("white","blue","red"), bias=1,space ="Lab")
+brk = c(0,0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)
+par(bty='n')
+#layout(matrix(1, 2, byrow=T))
+plot(m, breaks=brk, col=test(11), xaxs='i', yaxs='i', labels=F)
+axis(1, at=-81.5:-78.5, labels=F)
+points(tel$longitude, tel$latitude, pch=20, col='white')
+map('worldHires', c('Ecuador', 'Colombia'),  xlim=c(-81.5, -79), add=T)
+map.scale(x=-79.65, y=-2.3, ratio=FALSE)
+northarrow(loc=c(-81.25,0.5), size=0.3)
+par(bty='n')
+plot(n, breaks=brk, col=test(11), xaxs='i', yaxs='i', labels=F)
+axis(1, at=-81.5:-78.5, labels=F)
+points(tel$longitude, tel$latitude, pch=20, col='white')
+map('worldHires', c('Ecuador', 'Colombia'),  xlim=c(-81.5, -79), add=T)
+
+JACK KNIFE MAPS WITH TEST POINT:
+telTestLocs <- read.csv("../locs/tel_jack_test.csv")
+telA <- telTestLocs[telTestLocs$species == 'Heteromys teleus A',]
+telB <- telTestLocs[telTestLocs$species == 'Heteromys teleus B',]
+telC <- telTestLocs[telTestLocs$species == 'Heteromys teleus C',]
+telD <- telTestLocs[telTestLocs$species == 'Heteromys teleus D',]
+telE <- telTestLocs[telTestLocs$species == 'Heteromys teleus E',]
+telF <- telTestLocs[telTestLocs$species == 'Heteromys teleus F',]
+par(bty='n')
+#layout(matrix(1, 2, byrow=T))
+plot(r1, breaks=brk, col=test(11), xaxs='i', yaxs='i', labels=F)
+axis(1, at=-81.5:-78.5, labels=F)
+points(tel$longitude, tel$latitude, pch=20, col="white")
+points(tel$longitude, tel$latitude, pch=21)
+map('worldHires', c('Ecuador', 'Colombia'),  xlim=c(-81.5, -79), add=T)
+map.scale(x=-79.65, y=-2.3, ratio=FALSE)
+northarrow(loc=c(-81.25,0.5), size=0.3)
+points(telA$longitude, telA$latitude, pch=13)
+legend("bottomleft", legend =c('train', 'test'), pch=c(21,13), bty = "n", cex = 1.5)
+
+#ylim(-0.5,2.0), xlim(-80,-77.5)
+r1 <- raster("../H/2.0/Heteromys_australis_30A.asc")
+r2 <- raster("../H/2.0/Heteromys_australis_30B.asc")
+r3 <- raster("../H/2.0/Heteromys_australis_30C.asc")
+r4 <- raster("../H/2.0/Heteromys_australis_30D.asc")
+r5 <- raster("../H/2.0/Heteromys_australis_30E.asc")
+r6 <- raster("../H/2.0/Heteromys_australis_30F.asc")
+r7 <- raster("../H/2.0/Heteromys_australis_30G.asc")
+r8 <- raster("../H/2.0/Heteromys_australis_30H.asc")
+r9 <- raster("../H/2.0/Heteromys_australis_30I.asc")
+r10 <- raster("../L/1.0/Heteromys_australis_30A.asc")
+r11 <- raster("../L/1.0/Heteromys_australis_30B.asc")
+r12 <- raster("../L/1.0/Heteromys_australis_30C.asc")
+r13 <- raster("../L/1.0/Heteromys_australis_30D.asc")
+r14 <- raster("../L/1.0/Heteromys_australis_30E.asc")
+r15 <- raster("../L/1.0/Heteromys_australis_30F.asc")
+r16 <- raster("../L/1.0/Heteromys_australis_30G.asc")
+r17 <- raster("../L/1.0/Heteromys_australis_30H.asc")
+r18 <- raster("../L/1.0/Heteromys_australis_30I.asc")
+s <- stack(r1,r2,r3,r3,r5,r6,r7,r8,r9)
+t <- stack(r10,r11,r12,r13,r14,r15,r16,r17,r18)
+fun <- function(x, ...) { x[x==0] <- NA; mean(x, na.rm=TRUE) } 
+m <- calc(s, fun)
+n <- calc(t, fun)
+locs <- read.csv("../locs/het_filtered.csv")
+aust <- locs[1:9,]
+test <- colorRampPalette(c("white","blue","red"), bias=1,space ="Lab")
+brk = c(0,0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1)
+par(bty='n')
+plot(m, breaks=brk, col=test(11), xaxs='i', yaxs='i', labels=F)
+axis(1, at=-80:-77.5, labels=F)
+points(aust$longitude, aust$latitude, pch=20, col='white')
+map('worldHires', c('Ecuador', 'Colombia'),  xlim=c(-80, -77.5), add=T)
+map.scale(x=-70, y=-2.3, ratio=FALSE)
+northarrow(loc=c(-79.5,1.5), size=0.3)
+par(bty='n')
+plot(n, breaks=brk, col=test(11), xaxs='i', yaxs='i', labels=F)
+axis(1, at=-80:-75.5, labels=F)
+points(aust$longitude, aust$latitude, pch=20, col='white')
+map('worldHires', c('Ecuador', 'Colombia'),  xlim=c(-80, -77.5), add=T)
+
+JACK KNIFE MAPS WITH TEST POINT:
+telTestLocs <- read.csv("../locs/tel_jack_test.csv")
+telA <- telTestLocs[telTestLocs$species == 'Heteromys teleus A',]
+telB <- telTestLocs[telTestLocs$species == 'Heteromys teleus B',]
+telC <- telTestLocs[telTestLocs$species == 'Heteromys teleus C',]
+telD <- telTestLocs[telTestLocs$species == 'Heteromys teleus D',]
+telE <- telTestLocs[telTestLocs$species == 'Heteromys teleus E',]
+telF <- telTestLocs[telTestLocs$species == 'Heteromys teleus F',]
+par(bty='n')
+#layout(matrix(1, 2, byrow=T))
+plot(r1, breaks=brk, col=test(11), xaxs='i', yaxs='i', labels=F)
+axis(1, at=-81.5:-78.5, labels=F)
+points(tel$longitude, tel$latitude, pch=20, col="white")
+points(tel$longitude, tel$latitude, pch=21)
+map('worldHires', c('Ecuador', 'Colombia'),  xlim=c(-81.5, -79), add=T)
+map.scale(x=-79.65, y=-2.3, ratio=FALSE)
+northarrow(loc=c(-81.25,0.5), size=0.3)
+points(telA$longitude, telA$latitude, pch=13)
+legend("bottomleft", legend =c('train', 'test'), pch=c(21,13), bty = "n", cex = 1.5)
+
+
+JACK KNIFE MAPS WITH TEST POINT:
+austTestLocs <- read.csv("../locs/aust_test.csv")
+austA <- austTestLocs[austTestLocs$Sp == 'Aust_30A',]
+austB <- austTestLocs[austTestLocs$Sp == 'Aust_30B',]
+austC <- austTestLocs[austTestLocs$Sp == 'Aust_30C',]
+austD <- austTestLocs[austTestLocs$Sp == 'Aust_30D',]
+austE <- austTestLocs[austTestLocs$Sp == 'Aust_30E',]
+austF <- austTestLocs[austTestLocs$Sp == 'Aust_30F',]
+austG <- austTestLocs[austTestLocs$Sp == 'Aust_30G',]
+austH <- austTestLocs[austTestLocs$Sp == 'Aust_30H',]
+austI <- austTestLocs[austTestLocs$Sp == 'Aust_30I',]
+pdf("austI_default.pdf")
+par(bty='n')
+plot(r18, breaks=brk, col=test(11), xaxs='i', yaxs='i', labels=F)
+axis(1, at=-80:-77.5, labels=F)
+points(aust$longitude, aust$latitude, pch=20, col='white')
+map('worldHires', c('Ecuador', 'Colombia'),  xlim=c(-80, -77.5), add=T)
+points(austI$longitude, austI$latitude, pch=13)
+dev.off()
+
+map.scale(x=-70, y=-2.3, ratio=FALSE)
+northarrow(loc=c(-81.25,0.5), size=0.3)
+legend("bottomleft", legend =c('train', 'test'), pch=c(21,13), bty = "n", cex = 1.5)
+
+
+NORTH ARROW (http://www.google.com/url?sa=t&rct=j&q=north%20arrow%20on%20map%20in%20r&source=web&cd=3&ved=0CEAQFjAC&url=http%3A%2F%2Fwww.jstatsoft.org%2Fv19%2Fc01%2Fpaper&ei=ZeFmUeeKGe_G4AOV2YCQDA&usg=AFQjCNFiRfohmuGtEJufbVb3g8Nwp7gB2g&sig2=OikOLmN36rbUpWP66xwymA&bvm=bv.45107431,d.dmg):
+northarrow <- function(loc,size,bearing=0,cols,cex=1,...) {
+  # checking arguments
+  if(missing(loc)) stop("loc is missing")
+  if(missing(size)) stop("size is missing")
+  # default colors are white and black
+  if(missing(cols)) cols <- rep(c("white","black"),8)
+  # calculating coordinates of polygons
+  radii <- rep(size/c(1,4,2,4),4)
+  x <- radii[(0:15)+1]*cos((0:15)*pi/8+bearing)+loc[1]
+  y <- radii[(0:15)+1]*sin((0:15)*pi/8+bearing)+loc[2]
+  # drawing polygons
+  for (i in 1:15) {
+    x1 <- c(x[i],x[i+1],loc[1])
+    y1 <- c(y[i],y[i+1],loc[2])
+    polygon(x1,y1,col=cols[i])
+  }
+  # drawing the last polygon
+  polygon(c(x[16],x[1],loc[1]),c(y[16],y[1],loc[2]),col=cols[16])
+  # drawing letters
+  b <- c("","N","","")
+  for (i in 0:3) text((size+par("cxy")[1])*cos(bearing+i*pi/2)+loc[1],
+                      (size+par("cxy")[2])*sin(bearing+i*pi/2)+loc[2],b[i+1],
+                      cex=cex)
+}
+
+SCALE BAR:
+scalebar <- function(loc,length,unit="km",division.cex=.8,...) {
+  if(missing(loc)) stop("loc is missing")
+  if(missing(length)) stop("length is missing")
+  x <- c(0,length/c(4,2,4/3,1),length*1.1)+loc[1]
+  y <- c(0,length/(10*3:1))+loc[2]
+  cols <- rep(c("black","white"),2)
+  for (i in 1:4) rect(x[i],y[1],x[i+1],y[2],col=cols[i])
+  for (i in 1:5) segments(x[i],y[2],x[i],y[3])
+  labels <- x[c(1,3)]-loc[1]
+  labels <- append(labels,paste(x[5]-loc[1],unit))
+  text(x[c(1,3,5)],y[4],labels=labels,adj=.5,cex=division.cex)
+}
+
+
+
+
+
+
+I values
+> AustD.quant <- quantile(austI$D,c(0.025,.975))
+par(mfrow=c(2,2))
+density(austI$I, xlim=c(.65,1))
+abline(v=.976, lty=2)
+abline(v=.991, lty=2)
+abline(v=0.986)
+
+par(mfrow=c(2,2))
+plot(density(aust$I, to=1), xlim=c(.92,1), main='', xlab="I", yaxt='n')
+abline(v=.976, lty=2)
+abline(v=.991, lty=2)
+abline(v=0.986)
+plot(density(aust$D, to=1), xlim=c(.65,1), main='', xlab="D", yaxt='n', ylab='')
+abline(v=.821, lty=2)
+abline(v=.899, lty=2)
+abline(v=0.872)
+plot(density(tel$I, to=1), xlim=c(.92,1), main='', xlab="I", yaxt='n')
+abline(v=.930, lty=2)
+abline(v=.9996, lty=2)
+abline(v=0.983)
+plot(density(tel$D, to=1), xlim=c(.65,1), main='', xlab="D", yaxt='n', ylab='')
+abline(v=.693, lty=2)
+abline(v=.979, lty=2)
+abline(v=0.889)
+
+par(mfrow=c(2,2))
+hist(austI$I, xlim=c(.65,1))
+points(c(.976,.991),c(0,0), pch=16, col="red")
+points(0.986,0, pch=16, col="yellow")
+hist(austI$D, xlim=c(.65,1))
+points(c(.821,.899),c(0,0), pch=16, col="red")
+points(0.872,0, pch=16, col="yellow")
+hist(TelI$I, xlim=c(.65,1))
+points(c(.930,.9996),c(0,0), pch=16, col="red")
+points(0.983,0, pch=16, col="yellow")
+hist(TelI$D, xlim=c(.65,1))
+points(c(.693,.979),c(0,0), pch=16, col="red")
+points(0.889,0, pch=16, col="yellow")
+
+new I/D plot:
+myfont<-par(font=3)
+plot(tel$D,tel$I, xlim=c(.5,1), ylim=c(.5,1),col=addTrans("green",70),pch=16,cex=2,xlab="I",ylab="D")
+points(aust$D,aust$I,col=addTrans("purple",70),pch=16,cex=2)
+legend("bottomleft", legend =c('H. australis', 'H. teleus'), text.col=c('purple','green'),bty='n')
+par(myfont)
+
+with break
+library(plotrix)
+aust_metric <- read.csv("../I_Values/Aust_I_selftoself.csv")
+tel_metric <- read.csv("../I_Values/Tel_I_seftoself.csv")
+pdf("figure5_break.pdf", width=10, height=5)
+myfont<-par(font=3)
+#plot(tel_metric$D,tel_metric$I, xlim=c(0.3,1), ylim=c(0.3,1),col=addTrans("purple",70),pch=16,cex=2.5,xlab="I",ylab="D",axes=F)
+plot(aust_metric$D,aust_metric$I,col=addTrans("purple",70),pch=16,cex=2.5, xlab="I",ylab="D",axes=F, xlim=c(0.3,1), ylim=c(0.3,1))
+axis(2, at=c(0.3,0.4,0.5,0.6,0.7,0.8,0.9,1), labels=c('0','','0.5','0.6','0.7','0.8','0.9','1'))
+axis.break(axis=2,breakpos=0.4)
+axis(1, at=c(0.3,0.4,0.5,0.6,0.7,0.8,0.9,1), labels=c('0','','0.5','0.6','0.7','0.8','0.9','1'))
+axis.break(axis=1,breakpos=0.4)
+#legend("bottomleft", legend =c('H. australis', 'H. teleus'), text.col=c('green','purple'),bty='n', cex=1.5)
+
+
+
+
+
